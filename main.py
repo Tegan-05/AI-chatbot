@@ -7,6 +7,33 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+@tool
+def calculator(a: float, b: float, operation: str) -> str:
+    """Perform basic arithmetic operations on two numbers.
+    
+    Args:
+        a: The first number.
+        b: The second number.
+        operation: The math operation to perform. Must be one of: 'add', 'subtract', 'multiply', 'divide'.
+    """
+    print(f"Tool has been called by agent for operation: {operation}")
+    
+    operation = operation.lower().strip()
+    print("tool received operation:", operation)
+    if operation == "add":
+        return str(a + b)
+    elif operation == "subtract":
+        return str(a - b)
+    elif operation == "multiply":
+        return str(a * b)
+    elif operation == "divide":
+        if b == 0:
+            return "Error: Division by zero is undefined."
+        return str(a / b)
+    else:
+        return f"Error: Unknown operation '{operation}'."
+
+
 def main():
 
     model = ChatGoogleGenerativeAI(
@@ -14,7 +41,7 @@ def main():
         temperature=0,
     )
     
-    tools = []
+    tools = [calculator]
     agent_executor = create_react_agent(model=model, tools=tools)
     
     print("Welcome to the AI Chatbot! Type 'exit' to quit.")
