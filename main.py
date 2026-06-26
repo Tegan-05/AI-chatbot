@@ -1,32 +1,48 @@
-from langchain_core.messages import HumanMessage, HumnanMessage
-from langchain_google_genai import ChatGoogleGenAI
+from langchain_core.messages import HumanMessage
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.tools import tool
 from langgraph.prebuilt import create_react_agent
 from dotenv import load_dotenv
 
+
 load_dotenv()
+
 def main():
-    model = ChatGoogleGenAI(
-        model="gemini-1.5-flash",
+
+    model = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
         temperature=0,
     )
-    tool = []
-    agent = create_react_agent(model=model, tools=tool)
+    
+    tools = []
+    agent_executor = create_react_agent(model=model, tools=tools)
+    
     print("Welcome to the AI Chatbot! Type 'exit' to quit.")
-    print("Lets preform calculations, answer questions, and more!")
-    user_input = input("\nYou: ").strip()
-
+    print("Lets perform calculations, answer questions, and more!")
+    
     while True:
+    
 
-        if user_input == "exit":
+        user_input = input("\nYou: ").strip()
+        
+        if user_input.lower() == "exit":
+            print("Goodbye!")
             break
+            
+        if not user_input:
+            continue
 
         print("\nAssistant: ", end="")
-        for chunk in agent.stream(
+        
+
+        for chunk in agent_executor.stream(
             {"messages": [HumanMessage(content=user_input)]}
         ):
             if "agent" in chunk and "messages" in chunk["agent"]:
                 for message in chunk["agent"]["messages"]:
+                    # Print the content chunks dynamically
                     print(message.content, end="")
+        print()
 
-    
+if __name__ == "__main__":
+    main()
